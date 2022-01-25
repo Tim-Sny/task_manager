@@ -1,0 +1,321 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="DBContext.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="ExecutionTime">
+          <Key>
+            <PropertyRef Name="ExecutionTimeId" />
+          </Key>
+          <Property Name="ExecutionTimeId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TaskId" Type="int" Nullable="false" />
+          <Property Name="StartTime" Type="datetime" Nullable="false" />
+          <Property Name="EndTime" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Status">
+          <Key>
+            <PropertyRef Name="StatusId" />
+          </Key>
+          <Property Name="StatusId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="StatusName" Type="nchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Task">
+          <Key>
+            <PropertyRef Name="TaskId" />
+          </Key>
+          <Property Name="TaskId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ParentId" Type="int" Nullable="false" />
+          <Property Name="StatusId" Type="int" Nullable="false" />
+          <Property Name="Header" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Body" Type="nvarchar" MaxLength="1000" />
+          <Property Name="Executors" Type="nvarchar" MaxLength="50" />
+          <Property Name="StartDate" Type="datetime" Nullable="false" />
+          <Property Name="EndDate" Type="datetime" />
+          <Property Name="PlanLaborInput" Type="int" Nullable="false" />
+          <Property Name="IsDeleted" Type="bit" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_ExecutionTime_Task">
+          <End Role="Task" Type="Self.Task" Multiplicity="1" />
+          <End Role="ExecutionTime" Type="Self.ExecutionTime" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Task">
+              <PropertyRef Name="TaskId" />
+            </Principal>
+            <Dependent Role="ExecutionTime">
+              <PropertyRef Name="TaskId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Task_Status">
+          <End Role="Status" Type="Self.Status" Multiplicity="1" />
+          <End Role="Task" Type="Self.Task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Status">
+              <PropertyRef Name="StatusId" />
+            </Principal>
+            <Dependent Role="Task">
+              <PropertyRef Name="StatusId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="fnGetFlatList" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="in_IDTask" Type="int" Mode="In" />
+          <Parameter Name="in_Type" Type="int" Mode="In" />
+          <ReturnType>
+            <CollectionType>
+              <RowType>
+                <Property Name="TaskId" Type="int" />
+                <Property Name="ParentId" Type="int" />
+                <Property Name="TaskPath" Type="varchar" MaxLength="100" />
+                <Property Name="StatusId" Type="int" />
+                <Property Name="StatusName" Type="nvarchar" MaxLength="50" />
+                <Property Name="Header" Type="nvarchar" MaxLength="500" />
+                <Property Name="Body" Type="nvarchar" MaxLength="500" />
+                <Property Name="Executors" Type="nvarchar" MaxLength="500" />
+                <Property Name="StartDate" Type="date" />
+                <Property Name="StartDateStr" Type="varchar" MaxLength="10" />
+                <Property Name="EndDate" Type="date" />
+                <Property Name="EndDateStr" Type="varchar" MaxLength="10" />
+                <Property Name="PlanLaborInput" Type="int" />
+                <Property Name="PlanLaborInputChildTasks" Type="int" />
+                <Property Name="PlanLaborInputWithChildren" Type="int" />
+                <Property Name="FactLaborInput" Type="int" />
+                <Property Name="FactLaborInputChildTasks" Type="int" />
+                <Property Name="FactLaborInputWithChildren" Type="int" />
+                <Property Name="TaskIdStr" Type="varchar" MaxLength="10" />
+              </RowType>
+            </CollectionType>
+          </ReturnType>
+        </Function>
+        <EntityContainer Name="DBContextStoreContainer">
+          <EntitySet Name="ExecutionTime" EntityType="Self.ExecutionTime" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Status" EntityType="Self.Status" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Task" EntityType="Self.Task" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_ExecutionTime_Task" Association="Self.FK_ExecutionTime_Task">
+            <End Role="Task" EntitySet="Task" />
+            <End Role="ExecutionTime" EntitySet="ExecutionTime" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Task_Status" Association="Self.FK_Task_Status">
+            <End Role="Status" EntitySet="Status" />
+            <End Role="Task" EntitySet="Task" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="DBContext" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+          <FunctionImport Name="fnGetFlatListByTaskID" IsComposable="true" ReturnType="Collection(DBContext.fnGetFlatListByTaskID_Result)">
+            <Parameter Name="in_IDTask" Mode="In" Type="Int32" />
+            <Parameter Name="in_Type" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="fnGetFlatList" IsComposable="true" ReturnType="Collection(DBContext.fnGetFlatList_Result)">
+            <Parameter Name="in_IDTask" Mode="In" Type="Int32" />
+            <Parameter Name="in_Type" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <EntitySet Name="ExecutionTimes" EntityType="DBContext.ExecutionTime" />
+          <EntitySet Name="Status" EntityType="DBContext.Status" />
+          <EntitySet Name="Tasks" EntityType="DBContext.Task" />
+          <AssociationSet Name="FK_ExecutionTime_Task" Association="DBContext.FK_ExecutionTime_Task">
+            <End Role="Task" EntitySet="Tasks" />
+            <End Role="ExecutionTime" EntitySet="ExecutionTimes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Task_Status" Association="DBContext.FK_Task_Status">
+            <End Role="Status" EntitySet="Status" />
+            <End Role="Task" EntitySet="Tasks" />
+          </AssociationSet>
+          </EntityContainer>
+        <ComplexType Name="fnGetFlatListByTaskID_Result">
+          <Property Type="Int32" Name="TaskId" Nullable="true" />
+          <Property Type="Int32" Name="ParentId" Nullable="true" />
+          <Property Type="String" Name="TaskPath" Nullable="true" MaxLength="100" />
+          <Property Type="Int32" Name="StatusId" Nullable="true" />
+          <Property Type="String" Name="StatusName" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="Header" Nullable="true" MaxLength="500" />
+          <Property Type="String" Name="Body" Nullable="true" MaxLength="500" />
+          <Property Type="String" Name="Executors" Nullable="true" MaxLength="500" />
+          <Property Type="DateTime" Name="StartDate" Nullable="true" Precision="10" />
+          <Property Type="String" Name="StartDateStr" Nullable="true" MaxLength="10" />
+          <Property Type="DateTime" Name="PlannedEndDate" Nullable="true" Precision="10" />
+          <Property Type="String" Name="PlannedEndDateStr" Nullable="true" MaxLength="10" />
+          <Property Type="Int32" Name="PlannedTaskWeight" Nullable="true" />
+          <Property Type="Int32" Name="PlannedChildTasksWeight" Nullable="true" />
+          <Property Type="Int32" Name="PlannedFullTaskWeightWithChildren" Nullable="true" />
+          <Property Type="DateTime" Name="ActualEndDate" Nullable="true" Precision="10" />
+          <Property Type="String" Name="ActualEndDateStr" Nullable="true" MaxLength="10" />
+          <Property Type="Int32" Name="ActualTaskWeight" Nullable="true" />
+          <Property Type="Int32" Name="ActualChildTasksWeight" Nullable="true" />
+          <Property Type="Int32" Name="ActualFullTaskWeightWithChildren" Nullable="true" />
+          <Property Type="String" Name="TaskIdStr" Nullable="true" MaxLength="10" />
+        </ComplexType>
+        <ComplexType Name="fnGetFlatList_Result">
+          <Property Type="Int32" Name="TaskId" Nullable="true" />
+          <Property Type="Int32" Name="ParentId" Nullable="true" />
+          <Property Type="String" Name="TaskPath" Nullable="true" MaxLength="100" />
+          <Property Type="Int32" Name="StatusId" Nullable="true" />
+          <Property Type="String" Name="StatusName" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="Header" Nullable="true" MaxLength="500" />
+          <Property Type="String" Name="Body" Nullable="true" MaxLength="500" />
+          <Property Type="String" Name="Executors" Nullable="true" MaxLength="500" />
+          <Property Type="DateTime" Name="StartDate" Nullable="true" Precision="10" />
+          <Property Type="String" Name="StartDateStr" Nullable="true" MaxLength="10" />
+          <Property Type="DateTime" Name="EndDate" Nullable="true" Precision="10" />
+          <Property Type="String" Name="EndDateStr" Nullable="true" MaxLength="10" />
+          <Property Type="Int32" Name="PlanLaborInput" Nullable="true" />
+          <Property Type="Int32" Name="PlanLaborInputChildTasks" Nullable="true" />
+          <Property Type="Int32" Name="PlanLaborInputWithChildren" Nullable="true" />
+          <Property Type="Int32" Name="FactLaborInput" Nullable="true" />
+          <Property Type="Int32" Name="FactLaborInputChildTasks" Nullable="true" />
+          <Property Type="Int32" Name="FactLaborInputWithChildren" Nullable="true" />
+          <Property Type="String" Name="TaskIdStr" Nullable="true" MaxLength="10" />
+        </ComplexType>
+        <EntityType Name="ExecutionTime">
+          <Key>
+            <PropertyRef Name="ExecutionTimeId" />
+          </Key>
+          <Property Name="ExecutionTimeId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TaskId" Type="Int32" Nullable="false" />
+          <Property Name="StartTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EndTime" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Task" Relationship="DBContext.FK_ExecutionTime_Task" FromRole="ExecutionTime" ToRole="Task" />
+        </EntityType>
+        <EntityType Name="Status">
+          <Key>
+            <PropertyRef Name="StatusId" />
+          </Key>
+          <Property Name="StatusId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StatusName" Type="String" Nullable="false" MaxLength="50" FixedLength="true" Unicode="true" />
+          <NavigationProperty Name="Tasks" Relationship="DBContext.FK_Task_Status" FromRole="Status" ToRole="Task" />
+        </EntityType>
+        <EntityType Name="Task">
+          <Key>
+            <PropertyRef Name="TaskId" />
+          </Key>
+          <Property Name="TaskId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ParentId" Type="Int32" Nullable="false" />
+          <Property Name="StatusId" Type="Int32" Nullable="false" />
+          <Property Name="Header" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Body" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="Executors" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Precision="3" />
+          <Property Name="PlanLaborInput" Type="Int32" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="ExecutionTimes" Relationship="DBContext.FK_ExecutionTime_Task" FromRole="Task" ToRole="ExecutionTime" />
+          <NavigationProperty Name="Status" Relationship="DBContext.FK_Task_Status" FromRole="Task" ToRole="Status" />
+        </EntityType>
+        <Association Name="FK_ExecutionTime_Task">
+          <End Type="DBContext.Task" Role="Task" Multiplicity="1" />
+          <End Type="DBContext.ExecutionTime" Role="ExecutionTime" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Task">
+              <PropertyRef Name="TaskId" />
+            </Principal>
+            <Dependent Role="ExecutionTime">
+              <PropertyRef Name="TaskId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Task_Status">
+          <End Type="DBContext.Status" Role="Status" Multiplicity="1" />
+          <End Type="DBContext.Task" Role="Task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Status">
+              <PropertyRef Name="StatusId" />
+            </Principal>
+            <Dependent Role="Task">
+              <PropertyRef Name="StatusId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="DBContextStoreContainer" CdmEntityContainer="Entities">
+          <FunctionImportMapping FunctionImportName="fnGetFlatList" FunctionName="DBContext.Store.fnGetFlatList">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="DBContext.fnGetFlatList_Result">
+                <ScalarProperty Name="TaskId" ColumnName="TaskId" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="TaskPath" ColumnName="TaskPath" />
+                <ScalarProperty Name="StatusId" ColumnName="StatusId" />
+                <ScalarProperty Name="StatusName" ColumnName="StatusName" />
+                <ScalarProperty Name="Header" ColumnName="Header" />
+                <ScalarProperty Name="Body" ColumnName="Body" />
+                <ScalarProperty Name="Executors" ColumnName="Executors" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="StartDateStr" ColumnName="StartDateStr" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="EndDateStr" ColumnName="EndDateStr" />
+                <ScalarProperty Name="PlanLaborInput" ColumnName="PlanLaborInput" />
+                <ScalarProperty Name="PlanLaborInputChildTasks" ColumnName="PlanLaborInputChildTasks" />
+                <ScalarProperty Name="PlanLaborInputWithChildren" ColumnName="PlanLaborInputWithChildren" />
+                <ScalarProperty Name="FactLaborInput" ColumnName="FactLaborInput" />
+                <ScalarProperty Name="FactLaborInputChildTasks" ColumnName="FactLaborInputChildTasks" />
+                <ScalarProperty Name="FactLaborInputWithChildren" ColumnName="FactLaborInputWithChildren" />
+                <ScalarProperty Name="TaskIdStr" ColumnName="TaskIdStr" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="ExecutionTimes">
+            <EntityTypeMapping TypeName="DBContext.ExecutionTime">
+              <MappingFragment StoreEntitySet="ExecutionTime">
+                <ScalarProperty Name="EndTime" ColumnName="EndTime" />
+                <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+                <ScalarProperty Name="TaskId" ColumnName="TaskId" />
+                <ScalarProperty Name="ExecutionTimeId" ColumnName="ExecutionTimeId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Status">
+            <EntityTypeMapping TypeName="DBContext.Status">
+              <MappingFragment StoreEntitySet="Status">
+                <ScalarProperty Name="StatusName" ColumnName="StatusName" />
+                <ScalarProperty Name="StatusId" ColumnName="StatusId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Tasks">
+            <EntityTypeMapping TypeName="DBContext.Task">
+              <MappingFragment StoreEntitySet="Task">
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="PlanLaborInput" ColumnName="PlanLaborInput" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="Executors" ColumnName="Executors" />
+                <ScalarProperty Name="Body" ColumnName="Body" />
+                <ScalarProperty Name="Header" ColumnName="Header" />
+                <ScalarProperty Name="StatusId" ColumnName="StatusId" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="TaskId" ColumnName="TaskId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

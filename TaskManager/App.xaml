@@ -1,0 +1,7 @@
+﻿<Application
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:TaskManager"
+             xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="TaskManager.App"
+             StartupUri="View/MainWindow.xaml">
+</Application>
